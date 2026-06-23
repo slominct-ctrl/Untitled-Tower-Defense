@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLOCKLINE — Sign In</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root {
+    --panel: #11162088;
+    --line: #2a3344;
+    --signal: #5ee0a0;
+    --text: #eceff1;
+    --text-dim: #8b95a8;
+    --error: #ff5d6c;
+    --font-display: 'Baloo 2', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    min-height: 100vh;
+    font-family: var(--font-mono);
+    color: var(--text);
+    background: linear-gradient(100deg, #050510 0%, #0a0a2e 35%, #1c1c8c 75%, #2f2fd4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 380px;
+    background: rgba(10,14,24,0.55);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 32px 28px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 30px;
+    color: #fff;
+    text-shadow: 0 0 18px rgba(120,140,255,0.5);
+    margin: 0 0 4px;
+    text-align: center;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    margin: 0 0 26px;
+  }
+
+  .google-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #fff;
+    color: #1f1f1f;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .google-btn:hover { box-shadow: 0 4px 18px rgba(255,255,255,0.25); }
+  .google-btn:active { transform: scale(0.98); }
+  .google-btn svg { width: 18px; height: 18px; }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 22px 0;
+    color: var(--text-dim);
+    font-size: 11px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 8px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+  }
+  .tab-btn.active { background: var(--signal); color: #07150e; }
+
+  .field {
+    margin-bottom: 14px;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+  .field input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 12px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  .field input:focus { border-color: var(--signal); }
+  .field input.invalid { border-color: var(--error); }
+  .field-hint {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    margin-top: 5px;
+  }
+  .field-hint.error { color: var(--error); }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--signal);
+    color: #07150e;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+  }
+  .submit-btn:hover:not(:disabled) { box-shadow: 0 4px 18px rgba(94,224,160,0.35); }
+  .submit-btn:active:not(:disabled) { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .form-panel.hidden { display: none; }
+
+  .status-msg {
+    margin-top: 14px;
+    font-size: 12px;
+    text-align: center;
+    min-height: 16px;
+  }
+  .status-msg.error { color: var(--error); }
+  .status-msg.ok { color: var(--signal); }
+
+  .setup-warning {
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: rgba(255,93,108,0.1);
+    border: 1px solid rgba(255,93,108,0.3);
+    border-radius: 8px;
+    font-size: 11px;
+    line-height: 1.6;
+    color: #ffb3ba;
+  }
+  .setup-warning code {
+    background: rgba(0,0,0,0.3);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1 class="title">BLOCKLINE</h1>
+  <p class="subtitle">Sign in to defend the grid</p>
+
+  <button class="google-btn" id="google-signin">
+    <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.5 6.1 29.6 4 24 4 12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.5 6.1 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-2 14.1-5.3l-6.5-5.5C29.6 35 26.9 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.5 5.5C41.4 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+    Continue with Google
+  </button>
+
+  <div class="divider">or use username + password</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-login">Log in</button>
+    <button class="tab-btn" id="tab-signup">Create account</button>
+  </div>
+
+  <!-- LOG IN FORM -->
+  <form class="form-panel" id="form-login">
+    <div class="field">
+      <label for="login-username">Username</label>
+      <input type="text" id="login-username" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="submit-btn" id="login-submit">Log in</button>
+  </form>
+
+  <!-- SIGN UP FORM (shown after Google verification, or directly) -->
+  <form class="form-panel hidden" id="form-signup">
+    <div class="field">
+      <label for="signup-username">Choose a username</label>
+      <input type="text" id="signup-username" autocomplete="off" required minlength="3" maxlength="20">
+      <div class="field-hint" id="username-hint">3–20 characters, letters/numbers/underscore only.</div>
+    </div>
+    <div class="field">
+      <label for="signup-password">Choose a password</label>
+      <input type="password" id="signup-password" autocomplete="new-password" required minlength="6">
+      <div class="field-hint">At least 6 characters.</div>
+    </div>
+    <div class="field" id="signup-email-field">
+      <label for="signup-email">Email</label>
+      <input type="email" id="signup-email" autocomplete="email" required>
+      <div class="field-hint">Used for account recovery only.</div>
+    </div>
+    <button type="submit" class="submit-btn" id="signup-submit">Create account</button>
+  </form>
+
+  <div class="status-msg" id="status-msg"></div>
+
+  <div class="setup-warning" id="setup-warning">
+    ⚠️ Backend not connected yet. Open this file and fill in <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> near the top of the script before this page will work.
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+/* =========================================================
+   ⚙️ FILL THESE IN — from Supabase Project Settings → API
+   ========================================================= */
+const SUPABASE_URL = 'https://iapbnhxlsautupzlczxo.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_ey7ICL81WDsMdHDD2PQiIw_7vJfkw1L';
+
+const isConfigured = !SUPABASE_URL.includes('YOUR_') && !SUPABASE_ANON_KEY.includes('YOUR_');
+document.getElementById('setup-warning').style.display = isConfigured ? 'none' : 'block';
+
+const supabase = isConfigured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+/* =========================================================
+   DOM refs
+   ========================================================= */
+const tabLogin = document.getElementById('tab-login');
+const tabSignup = document.getElementById('tab-signup');
+const formLogin = document.getElementById('form-login');
+const formSignup = document.getElementById('form-signup');
+const statusMsg = document.getElementById('status-msg');
+const googleBtn = document.getElementById('google-signin');
+
+function setStatus(msg, kind){
+  statusMsg.textContent = msg;
+  statusMsg.className = 'status-msg' + (kind ? ' ' + kind : '');
+}
+
+function showTab(which){
+  if (which === 'login'){
+    tabLogin.classList.add('active'); tabSignup.classList.remove('active');
+    formLogin.classList.remove('hidden'); formSignup.classList.add('hidden');
+  } else {
+    tabSignup.classList.add('active'); tabLogin.classList.remove('active');
+    formSignup.classList.remove('hidden'); formLogin.classList.add('hidden');
+  }
+  setStatus('', '');
+}
+tabLogin.addEventListener('click', () => showTab('login'));
+tabSignup.addEventListener('click', () => showTab('signup'));
+
+/* =========================================================
+   Username validation (3–20 chars, letters/numbers/underscore)
+   Mirrors the DB constraint — but the DB is the real enforcement.
+   ========================================================= */
+const USERNAME_RE = /^[A-Za-z0-9_]{3,20}$/;
+const usernameInput = document.getElementById('signup-username');
+const usernameHint = document.getElementById('username-hint');
+let usernameCheckTimer = null;
+
+usernameInput.addEventListener('input', () => {
+  const val = usernameInput.value;
+  clearTimeout(usernameCheckTimer);
+
+  if (val.length === 0){
+    usernameHint.textContent = '3–20 characters, letters/numbers/underscore only.';
+    usernameHint.className = 'field-hint';
+    usernameInput.classList.remove('invalid');
+    return;
+  }
+  if (!USERNAME_RE.test(val)){
+    usernameHint.textContent = val.length < 3
+      ? 'Too short — minimum 3 characters.'
+      : (val.length > 20 ? 'Too long — maximum 20 characters.' : 'Only letters, numbers, and underscore allowed.');
+    usernameHint.className = 'field-hint error';
+    usernameInput.classList.add('invalid');
+    return;
+  }
+  usernameInput.classList.remove('invalid');
+  usernameHint.textContent = 'Checking availability…';
+  usernameHint.className = 'field-hint';
+
+  usernameCheckTimer = setTimeout(async () => {
+    if (!isConfigured) return;
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .ilike('username', val)
+      .maybeSingle();
+    if (error){
+      usernameHint.textContent = 'Could not check availability right now.';
+      usernameHint.className = 'field-hint error';
+      return;
+    }
+    if (data){
+      usernameHint.textContent = 'That username is already taken.';
+      usernameHint.className = 'field-hint error';
+      usernameInput.classList.add('invalid');
+    } else {
+      usernameHint.textContent = 'Username is available ✓';
+      usernameHint.className = 'field-hint';
+    }
+  }, 450);
+});
+
+/* =========================================================
+   Sign up: creates auth user (email+password) then a profile
+   row with the chosen username. DB unique constraint is the
+   real source of truth for "no duplicate usernames".
+   ========================================================= */
+formSignup.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!isConfigured){ setStatus('Backend not connected yet — see the warning below.', 'error'); return; }
+
+  const username = document.getElementById('signup-username').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const email = document.getElementById('signup-email').value.trim();
+
+  if (!USERNAME_RE.test(username)){
+    setStatus('Username must be 3–20 characters (letters, numbers, underscore).', 'error');
+    return;
+  }
+  if (password.length < 6){
+    setStatus('Password must be at least 6 characters.', 'error');
+    return;
+  }
+
+  setStatus('Creating account…', '');
+  const submitBtn = document.getElementById('signup-submit');
+  submitBtn.disabled = true;
+
+  const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+
+  if (authError){
+    setStatus(authError.message, 'error');
+    submitBtn.disabled = false;
+    return;
+  }
+
+  const userId = authData.user?.id;
+  if (!userId){
+    setStatus('Check your email to confirm your account, then log in.', 'ok');
+    submitBtn.disabled = false;
+    return;
+  }
+
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .insert({ id: userId, username });
+
+  submitBtn.disabled = false;
+
+  if (profileError){
+    // Most common case: someone grabbed the username in the split second
+    // between the availability check and this insert. The DB's unique
+    // index is what actually prevents the collision.
+    if (profileError.code === '23505'){
+      setStatus('That username was just taken — try another.', 'error');
+    } else {
+      setStatus(profileError.message, 'error');
+    }
+    return;
+  }
+
+  setStatus('Account created! Redirecting…', 'ok');
+  redirectToGame();
+});
+
+/* =========================================================
+   Log in with username + password.
+   Supabase Auth itself only knows email+password, so we look
+   up the email behind the username first, then sign in.
+   ========================================================= */
+formLogin.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!isConfigured){ setStatus('Backend not connected yet — see the warning below.', 'error'); return; }
+
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const submitBtn = document.getElementById('login-submit');
+  submitBtn.disabled = true;
+  setStatus('Logging in…', '');
+
+  // Look up this username's linked account via a server-side function.
+  // (We can't query auth.users directly from the browser, so login goes
+  // through a Postgres function that maps username -> email safely.)
+  const { data, error } = await supabase.rpc('email_for_username', { uname: username });
+
+  if (error || !data){
+    setStatus('No account found with that username.', 'error');
+    submitBtn.disabled = false;
+    return;
+  }
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email: data, password });
+  submitBtn.disabled = false;
+
+  if (signInError){
+    setStatus('Incorrect username or password.', 'error');
+    return;
+  }
+
+  setStatus('Welcome back! Redirecting…', 'ok');
+  redirectToGame();
+});
+
+/* =========================================================
+   Google sign-in
+   ========================================================= */
+googleBtn.addEventListener('click', async () => {
+  if (!isConfigured){ setStatus('Backend not connected yet — see the warning below.', 'error'); return; }
+  setStatus('Redirecting to Google…', '');
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) setStatus(error.message, 'error');
+});
+
+/* =========================================================
+   After a Google redirect comes back, check if this user
+   already has a username. If not, send them to the signup
+   tab to pick one (account exists, but needs a username).
+   ========================================================= */
+async function handleSessionOnLoad(){
+  if (!isConfigured) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (profile){
+    redirectToGame();
+  } else {
+    // Logged in via Google but no username chosen yet
+    showTab('signup');
+    document.getElementById('signup-email-field').style.display = 'none';
+    document.getElementById('signup-email').required = false;
+    setStatus('Signed in with Google — pick a username to finish.', 'ok');
+  }
+}
+handleSessionOnLoad();
+
+function redirectToGame(){
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
